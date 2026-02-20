@@ -1,357 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Big E High School • Student Access</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big E High School - Student Portal</title>
   <style>
-    :root {
-      --bg: #0a0e17;
-      --surface: rgba(20, 25, 40, 0.7);
-      --accent: #ff3366;
-      --accent-glow: #ff4d7a;
-      --text: #f0f4f8;
-      --muted: #a0b0c0;
-      --border: rgba(255, 51, 102, 0.2);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0a0e17 0%, #0f1624 100%);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow-x: hidden;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f7fa;
+      color: #333;
+      line-height: 1.6;
     }
-
     header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      backdrop-filter: blur(16px);
-      background: rgba(10, 14, 23, 0.6);
-      border-bottom: 1px solid var(--border);
-      padding: 1.2rem 3rem;
-      z-index: 100;
+      background: #004080;
+      color: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-
-    .header-content {
-      max-width: 1400px;
+    .header-inner {
+      max-width: 1200px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
-
-    .logo {
-      font-size: 1.6rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(90deg, #ff3366, #ff6b8a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .school-name {
+      font-size: 1.8rem;
+      font-weight: bold;
     }
-
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      margin: 0;
+    }
     nav a {
-      color: var(--muted);
+      color: white;
       text-decoration: none;
-      margin-left: 2rem;
       font-weight: 500;
-      transition: color 0.3s;
     }
-
-    nav a:hover {
-      color: var(--accent);
-    }
+    nav a:hover { text-decoration: underline; }
 
     main {
-      margin-top: 120px;
-      width: 100%;
-      max-width: 1400px;
-      padding: 0 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
     }
 
-    #login {
-      max-width: 420px;
-      margin: 0 auto;
-      background: var(--surface);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 3rem 2.5rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    #login-section {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 2.5rem;
+      max-width: 500px;
+      margin: 6rem auto 4rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
       text-align: center;
-      transition: transform 0.4s ease;
     }
-
-    #login h1 {
-      font-size: 2.2rem;
-      margin-bottom: 0.8rem;
-      background: linear-gradient(90deg, #ff3366, #ff6b8a);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    #login-section h1 {
+      color: #004080;
+      margin-bottom: 1rem;
+      font-size: 2rem;
     }
-
-    #login p {
-      color: var(--muted);
-      margin-bottom: 2rem;
-      font-size: 1.05rem;
+    #login-section p {
+      color: #555;
+      margin-bottom: 1.8rem;
     }
-
     input[type="password"] {
       width: 100%;
-      padding: 1.1rem 1.4rem;
-      font-size: 1.15rem;
-      background: rgba(30, 40, 60, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: white;
-      margin-bottom: 1.5rem;
-      transition: all 0.3s;
+      padding: 0.9rem;
+      font-size: 1.1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 1.2rem;
     }
-
-    input[type="password"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(255,51,102,0.15);
-      outline: none;
-    }
-
-    #unlock-btn {
+    #login-section button {
       width: 100%;
-      padding: 1.2rem;
-      font-size: 1.15rem;
-      font-weight: 600;
-      background: linear-gradient(90deg, #ff3366, #ff6b8a);
+      padding: 0.9rem;
+      font-size: 1.1rem;
+      background: #004080;
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.3s;
     }
-
-    #unlock-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(255,51,102,0.3);
+    #login-section button:hover {
+      background: #0055aa;
     }
-
     #error {
-      color: #ff6b8a;
+      color: #c00;
       margin-top: 1rem;
-      font-size: 0.95rem;
-      min-height: 1.2rem;
+      font-weight: bold;
     }
 
     #dashboard {
       display: none;
-      padding: 3rem 1rem;
     }
-
-    .welcome {
-      text-align: center;
-      margin-bottom: 4rem;
+    .welcome-box {
+      background: #e8f0ff;
+      border-left: 5px solid #004080;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      border-radius: 6px;
     }
-
-    .welcome h2 {
-      font-size: 2.8rem;
-      margin-bottom: 0.8rem;
-      background: linear-gradient(90deg, #ff3366, #ff6b8a, #ff8cab);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .welcome-box h2 {
+      color: #004080;
+      margin-bottom: 0.5rem;
     }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.8rem;
+      gap: 1.5rem;
     }
-
     .card {
-      background: var(--surface);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem 1.8rem;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.8rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      transform: translateZ(0);
+      transition: box-shadow 0.2s;
     }
-
     .card:hover {
-      transform: translateY(-12px) rotate(1deg) scale(1.03);
-      border-color: var(--accent);
-      box-shadow: 0 20px 50px rgba(255,51,102,0.2);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
     }
-
     .card h3 {
-      font-size: 1.45rem;
+      color: #004080;
       margin-bottom: 0.8rem;
-      color: var(--accent);
+      font-size: 1.3rem;
     }
-
     .card p {
-      color: var(--muted);
+      color: #666;
       font-size: 0.95rem;
     }
 
-    #iframe-overlay {
+    #iframe-container {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(10,14,23,0.98);
-      z-index: 9999;
-      backdrop-filter: blur(8px);
+      background: white;
+      z-index: 1000;
     }
-
-    #main-frame {
+    #main-iframe {
       width: 100%;
       height: 100%;
       border: none;
     }
-
-    .close-tip {
+    .close-hint {
       position: absolute;
-      bottom: 30px;
-      right: 40px;
-      background: rgba(255,51,102,0.9);
+      bottom: 20px;
+      right: 30px;
+      background: #004080;
       color: white;
-      padding: 12px 24px;
-      border-radius: 50px;
-      font-size: 1rem;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      z-index: 1001;
     }
 
     footer {
-      margin-top: auto;
-      padding: 2rem;
+      background: #004080;
+      color: white;
       text-align: center;
-      color: var(--muted);
+      padding: 1.5rem;
+      margin-top: 4rem;
       font-size: 0.9rem;
-      border-top: 1px solid var(--border);
     }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="header-content">
-      <div class="logo">Big E High School</div>
+    <div class="header-inner">
+      <div class="school-name">Big E High School</div>
       <nav>
-        <a href="#">Dashboard</a>
-        <a href="#">Classes</a>
-        <a href="#">Calendar</a>
-        <a href="#">Resources</a>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Students</a></li>
+          <li><a href="#">Parents</a></li>
+          <li><a href="#">Calendar</a></li>
+          <li><a href="#">Resources</a></li>
+        </ul>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- Login -->
-    <div id="login">
-      <h1>Student Portal</h1>
-      <p>Secure access to grades, schedules, and resources</p>
-      <input type="password" id="pass" placeholder="Access code" autocomplete="off">
-      <button id="unlock-btn" onclick="unlock()">Enter Portal</button>
-      <div id="error"></div>
-    </div>
 
-    <!-- Dashboard -->
-    <div id="dashboard">
-      <div class="welcome">
-        <h2>Welcome Back</h2>
-        <p>Your personalized student dashboard</p>
+    <section id="login-section">
+      <h1>Student Portal</h1>
+      <p>Log in to view grades, schedules, assignments and school services</p>
+      <input type="password" id="pass-input" placeholder="Enter access code">
+      <button onclick="checkCode()">Log In</button>
+      <div id="error"></div>
+    </section>
+
+    <section id="dashboard">
+      <div class="welcome-box">
+        <h2>Welcome to Your Student Dashboard</h2>
+        <p>Access your classes, library, calendar and other school tools.</p>
       </div>
 
       <div class="grid">
-        <div class="card" onclick="loadSite('http://kashimo.freeddns.org/')">
-          <h3>Kashimo Resources</h3>
-          <p>Advanced coursework & tools</p>
+        <div class="card" onclick="openLink('http://kashimo.freeddns.org/')">
+          <h3>Online Learning Platform</h3>
+          <p>Digital assignments and class content</p>
         </div>
-        <div class="card" onclick="loadSite('https://hakari.freeddns.org/')">
-          <h3>Hakari Lab</h3>
-          <p>Science simulations & labs</p>
+        <div class="card" onclick="openLink('https://hakari.freeddns.org/')">
+          <h3>Science Lab Access</h3>
+          <p>Virtual experiments and simulations</p>
         </div>
-        <div class="card" onclick="loadSite('https://www.seraphim.freeddns.org/')">
-          <h3>Seraphim Library</h3>
-          <p>Digital books & research</p>
+        <div class="card" onclick="openLink('https://www.seraphim.freeddns.org/')">
+          <h3>School Library Portal</h3>
+          <p>eBooks, databases and research tools</p>
         </div>
-        <div class="card" onclick="loadSite('https://ryomen.freeddns.org/')">
-          <h3>Ryomen Archives</h3>
-          <p>Historical & cultural content</p>
+        <div class="card" onclick="openLink('https://ryomen.freeddns.org/')">
+          <h3>History & Social Studies</h3>
+          <p>Archives and project materials</p>
         </div>
-        <div class="card" onclick="loadSite('https://sukuna.freeddns.org/')">
-          <h3>Sukuna Project</h3>
-          <p>Advanced computing hub</p>
+        <div class="card" onclick="openLink('https://sukuna.freeddns.org/')">
+          <h3>Math & Technology Resources</h3>
+          <p>Calculators, coding and math tools</p>
         </div>
-        <div class="card" onclick="loadSite('https://satoru.freeddns.org/')">
-          <h3>Satoru Media</h3>
-          <p>Tutorials & video library</p>
+        <div class="card" onclick="openLink('https://satoru.freeddns.org/')">
+          <h3>Educational Media Center</h3>
+          <p>Videos, tutorials and presentations</p>
         </div>
-        <div class="card" onclick="loadSite('https://kinji.freeddns.org/')">
-          <h3>Kinji Athletics</h3>
-          <p>Sports & fitness resources</p>
+        <div class="card" onclick="openLink('https://kinji.freeddns.org/')">
+          <h3>Athletics & PE Portal</h3>
+          <p>Sports info and fitness resources</p>
         </div>
-        <div class="card" onclick="loadSite('https://tojifushiguro.freeddns.org/')">
-          <h3>Toji Fushiguro Hub</h3>
-          <p>Main student activity center</p>
+        <div class="card" onclick="openLink('https://tojifushiguro.freeddns.org/')">
+          <h3>Student Services Hub</h3>
+          <p>Attendance, counseling and support</p>
         </div>
       </div>
-    </div>
+    </section>
+
   </main>
 
-  <div id="iframe-overlay">
-    <iframe id="main-frame" allowfullscreen></iframe>
-    <div class="close-tip">Press ` to close</div>
+  <div id="iframe-container">
+    <iframe id="main-iframe" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" allowfullscreen></iframe>
+    <div class="close-hint">Press ` (backtick) to close</div>
   </div>
 
   <footer>
-    Big E High School • Indianapolis, IN • © 2026
+    Big E High School • Indianapolis, IN • © 2026 Big E Public Schools
   </footer>
 
   <script>
-    const codes = ["damnmonkeys", "Password1!"];
+    const validCodes = ["damnmonkeys", "Password1!"];
 
-    function unlock() {
-      const val = document.getElementById("pass").value;
-      const err = document.getElementById("error");
+    function checkCode() {
+      const input = document.getElementById("pass-input").value;
+      const errorDiv = document.getElementById("error");
 
-      if (codes.includes(val)) {
-        document.getElementById("login").style.display = "none";
+      if (validCodes.includes(input)) {
+        document.getElementById("login-section").style.display = "none";
         document.getElementById("dashboard").style.display = "block";
+        errorDiv.textContent = "";
       } else {
-        err.textContent = "Invalid access code.";
-        document.getElementById("pass").value = "";
+        errorDiv.textContent = "Invalid access code. Try again.";
+        document.getElementById("pass-input").value = "";
       }
     }
 
-    function loadSite(url) {
-      document.getElementById("main-frame").src = url;
-      document.getElementById("iframe-overlay").style.display = "block";
+    function openLink(url) {
+      const iframe = document.getElementById("main-iframe");
+      iframe.src = url;
+      document.getElementById("iframe-container").style.display = "block";
     }
 
-    document.addEventListener("keydown", e => {
-      if (e.key === "`" || e.key === "~") {
-        document.getElementById("iframe-overlay").style.display = "none";
-        document.getElementById("main-frame").src = "";
+    // Improved backtick detection
+    document.addEventListener("keydown", function(e) {
+      // Detect ` or ~ (shift + `)
+      if (e.key === "`" || e.key === "~" || (e.keyCode === 192 && !e.shiftKey) || (e.keyCode === 192 && e.shiftKey)) {
+        e.preventDefault(); // Stop any default browser action
+        const container = document.getElementById("iframe-container");
+        if (container.style.display === "block") {
+          container.style.display = "none";
+          document.getElementById("main-iframe").src = "";
+        }
       }
     });
 
-    document.getElementById("pass").addEventListener("keypress", e => {
-      if (e.key === "Enter") unlock();
+    // Enter key in password field
+    document.getElementById("pass-input").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        checkCode();
+      }
     });
-
-    // Auto-focus password field
-    document.getElementById("pass").focus();
   </script>
 </body>
 </html>
