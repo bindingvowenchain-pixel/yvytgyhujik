@@ -1,285 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Big E High School • Student Portal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Big E High School • Student Access</title>
   <style>
-    body {
+    :root {
+      --bg: #0a0e17;
+      --surface: rgba(20, 25, 40, 0.7);
+      --accent: #ff3366;
+      --accent-glow: #ff4d7a;
+      --text: #f0f4f8;
+      --muted: #a0b0c0;
+      --border: rgba(255, 51, 102, 0.2);
+    }
+
+    * {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #0d1117;
-      color: #e6e6e6;
-      line-height: 1.6;
+      padding: 0;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0a0e17 0%, #0f1624 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
     header {
-      background: #8b0000;
-      padding: 1.2rem 2rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      backdrop-filter: blur(16px);
+      background: rgba(10, 14, 23, 0.6);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 3rem;
+      z-index: 100;
     }
-    .header-inner {
-      max-width: 1200px;
+
+    .header-content {
+      max-width: 1400px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
     }
-    .school-name {
-      font-size: 1.9rem;
-      font-weight: bold;
-      color: white;
+
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ff3366, #ff6b8a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 1.8rem;
-      margin: 0;
-      flex-wrap: wrap;
-    }
+
     nav a {
-      color: white;
+      color: var(--muted);
       text-decoration: none;
+      margin-left: 2rem;
       font-weight: 500;
-    }
-    nav a:hover { text-decoration: underline; }
-
-    .main {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
+      transition: color 0.3s;
     }
 
-    #login-box {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 2.5rem;
-      max-width: 520px;
-      margin: 8vh auto;
-      text-align: center;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    nav a:hover {
+      color: var(--accent);
     }
-    #login-box h1 {
-      color: #ff4d4d;
-      margin-bottom: 1.2rem;
-    }
-    #search-bar {
+
+    main {
+      margin-top: 120px;
       width: 100%;
-      padding: 0.9rem 1.2rem;
-      font-size: 1.1rem;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      color: #e6e6e6;
-      margin-bottom: 1rem;
+      max-width: 1400px;
+      padding: 0 2rem;
     }
-    #search-bar:focus {
-      border-color: #ff4d4d;
+
+    #login {
+      max-width: 420px;
+      margin: 0 auto;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      text-align: center;
+      transition: transform 0.4s ease;
+    }
+
+    #login h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.8rem;
+      background: linear-gradient(90deg, #ff3366, #ff6b8a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #login p {
+      color: var(--muted);
+      margin-bottom: 2rem;
+      font-size: 1.05rem;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 1.1rem 1.4rem;
+      font-size: 1.15rem;
+      background: rgba(30, 40, 60, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: white;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s;
+    }
+
+    input[type="password"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255,51,102,0.15);
       outline: none;
     }
-    #login-btn {
+
+    #unlock-btn {
       width: 100%;
-      padding: 0.9rem;
-      font-size: 1.1rem;
-      background: #8b0000;
+      padding: 1.2rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+      background: linear-gradient(90deg, #ff3366, #ff6b8a);
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 12px;
       cursor: pointer;
-    }
-    #login-btn:hover { background: #a00000; }
-    #error-msg {
-      color: #ff4d4d;
-      margin-top: 1rem;
-      font-weight: bold;
+      transition: all 0.3s;
     }
 
-    #portal {
+    #unlock-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255,51,102,0.3);
+    }
+
+    #error {
+      color: #ff6b8a;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      min-height: 1.2rem;
+    }
+
+    #dashboard {
       display: none;
+      padding: 3rem 1rem;
     }
+
     .welcome {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
+      text-align: center;
+      margin-bottom: 4rem;
     }
-    .welcome h2 { color: #ff4d4d; }
+
+    .welcome h2 {
+      font-size: 2.8rem;
+      margin-bottom: 0.8rem;
+      background: linear-gradient(90deg, #ff3366, #ff6b8a, #ff8cab);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.5rem;
-    }
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 1.8rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .card:hover {
-      border-color: #ff4d4d;
-      transform: translateY(-4px);
-      box-shadow: 0 6px 16px rgba(139,0,0,0.3);
-    }
-    .card h3 {
-      color: #ff4d4d;
-      margin-bottom: 0.8rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.8rem;
     }
 
-    #iframe-box {
+    .card {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform: translateZ(0);
+    }
+
+    .card:hover {
+      transform: translateY(-12px) rotate(1deg) scale(1.03);
+      border-color: var(--accent);
+      box-shadow: 0 20px 50px rgba(255,51,102,0.2);
+    }
+
+    .card h3 {
+      font-size: 1.45rem;
+      margin-bottom: 0.8rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    #iframe-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: #000;
+      background: rgba(10,14,23,0.98);
       z-index: 9999;
+      backdrop-filter: blur(8px);
     }
-    #main-iframe {
+
+    #main-frame {
       width: 100%;
       height: 100%;
       border: none;
     }
-    .close-notice {
+
+    .close-tip {
       position: absolute;
-      bottom: 20px;
-      right: 30px;
-      background: rgba(139,0,0,0.8);
+      bottom: 30px;
+      right: 40px;
+      background: rgba(255,51,102,0.9);
       color: white;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-size: 0.95rem;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 1rem;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
 
     footer {
-      background: #0d1117;
-      padding: 1.2rem;
-      text-align: center;
-      font-size: 0.9rem;
-      border-top: 1px solid #30363d;
       margin-top: auto;
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
     }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="header-inner">
-      <div class="school-name">Big E High School</div>
+    <div class="header-content">
+      <div class="logo">Big E High School</div>
       <nav>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Students</a></li>
-          <li><a href="#">Parents</a></li>
-          <li><a href="#">Staff</a></li>
-          <li><a href="#">Calendar</a></li>
-        </ul>
+        <a href="#">Dashboard</a>
+        <a href="#">Classes</a>
+        <a href="#">Calendar</a>
+        <a href="#">Resources</a>
       </nav>
     </div>
   </header>
 
-  <div class="main">
-
-    <!-- Fake search / password entry -->
-    <div id="login-box">
+  <main>
+    <!-- Login -->
+    <div id="login">
       <h1>Student Portal</h1>
-      <p>Search classes, grades, resources or log in</p>
-      <input type="text" id="search-bar" placeholder="Search portal or enter access..." autocomplete="off">
-      <button id="login-btn" onclick="checkPassword()">Go</button>
-      <div id="error-msg"></div>
+      <p>Secure access to grades, schedules, and resources</p>
+      <input type="password" id="pass" placeholder="Access code" autocomplete="off">
+      <button id="unlock-btn" onclick="unlock()">Enter Portal</button>
+      <div id="error"></div>
     </div>
 
-    <!-- Real dashboard after password -->
-    <div id="portal">
+    <!-- Dashboard -->
+    <div id="dashboard">
       <div class="welcome">
-        <h2>Welcome to Big E Student Portal</h2>
-        <p>Quick access to your classes, resources, activities, and more.</p>
+        <h2>Welcome Back</h2>
+        <p>Your personalized student dashboard</p>
       </div>
 
       <div class="grid">
-        <div class="card" onclick="openIframe('http://kashimo.freeddns.org/')">
+        <div class="card" onclick="loadSite('http://kashimo.freeddns.org/')">
           <h3>Kashimo Resources</h3>
-          <p>Advanced study materials & tools</p>
+          <p>Advanced coursework & tools</p>
         </div>
-        <div class="card" onclick="openIframe('https://hakari.freeddns.org/')">
+        <div class="card" onclick="loadSite('https://hakari.freeddns.org/')">
           <h3>Hakari Lab</h3>
-          <p>Interactive science simulations</p>
+          <p>Science simulations & labs</p>
         </div>
-        <div class="card" onclick="openIframe('https://www.seraphim.freeddns.org/')">
+        <div class="card" onclick="loadSite('https://www.seraphim.freeddns.org/')">
           <h3>Seraphim Library</h3>
-          <p>Digital books & research database</p>
+          <p>Digital books & research</p>
         </div>
-        <div class="card" onclick="openIframe('https://ryomen.freeddns.org/')">
+        <div class="card" onclick="loadSite('https://ryomen.freeddns.org/')">
           <h3>Ryomen Archives</h3>
-          <p>Historical & cultural references</p>
+          <p>Historical & cultural content</p>
         </div>
-        <div class="card" onclick="openIframe('https://sukuna.freeddns.org/')">
+        <div class="card" onclick="loadSite('https://sukuna.freeddns.org/')">
           <h3>Sukuna Project</h3>
-          <p>Advanced computing & coding</p>
+          <p>Advanced computing hub</p>
         </div>
-        <div class="card" onclick="openIframe('https://satoru.freeddns.org/')">
-          <h3>Satoru Media Center</h3>
-          <p>Videos, tutorials & presentations</p>
+        <div class="card" onclick="loadSite('https://satoru.freeddns.org/')">
+          <h3>Satoru Media</h3>
+          <p>Tutorials & video library</p>
         </div>
-        <div class="card" onclick="openIframe('https://kinji.freeddns.org/')">
+        <div class="card" onclick="loadSite('https://kinji.freeddns.org/')">
           <h3>Kinji Athletics</h3>
-          <p>Sports schedules & training resources</p>
+          <p>Sports & fitness resources</p>
         </div>
-        <div class="card" onclick="openIframe('https://tojifushiguro.freeddns.org/')">
+        <div class="card" onclick="loadSite('https://tojifushiguro.freeddns.org/')">
           <h3>Toji Fushiguro Hub</h3>
-          <p>Main student activity portal</p>
+          <p>Main student activity center</p>
         </div>
       </div>
     </div>
+  </main>
 
-  </div>
-
-  <!-- Iframe overlay -->
-  <div id="iframe-box">
-    <iframe id="main-iframe" allowfullscreen></iframe>
-    <div class="close-notice">Press ` to close</div>
+  <div id="iframe-overlay">
+    <iframe id="main-frame" allowfullscreen></iframe>
+    <div class="close-tip">Press ` to close</div>
   </div>
 
   <footer>
-    Big E High School • Indianapolis, IN • © 2026 Big E Public Schools
+    Big E High School • Indianapolis, IN • © 2026
   </footer>
 
   <script>
-    const validPasswords = ["damnmonkeys", "Password1!"];
+    const codes = ["damnmonkeys", "Password1!"];
 
-    function checkPassword() {
-      const input = document.getElementById("search-bar").value.trim();
-      const error = document.getElementById("error-msg");
+    function unlock() {
+      const val = document.getElementById("pass").value;
+      const err = document.getElementById("error");
 
-      if (validPasswords.includes(input)) {
-        document.getElementById("login-box").style.display = "none";
-        document.getElementById("portal").style.display = "block";
+      if (codes.includes(val)) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
       } else {
-        error.textContent = "No results found. Try different keywords.";
-        document.getElementById("search-bar").value = "";
+        err.textContent = "Invalid access code.";
+        document.getElementById("pass").value = "";
       }
     }
 
-    function openIframe(url) {
-      document.getElementById("main-iframe").src = url;
-      document.getElementById("iframe-box").style.display = "block";
+    function loadSite(url) {
+      document.getElementById("main-frame").src = url;
+      document.getElementById("iframe-overlay").style.display = "block";
     }
 
     document.addEventListener("keydown", e => {
       if (e.key === "`" || e.key === "~") {
-        document.getElementById("iframe-box").style.display = "none";
-        document.getElementById("main-iframe").src = "";
+        document.getElementById("iframe-overlay").style.display = "none";
+        document.getElementById("main-frame").src = "";
       }
     });
 
-    document.getElementById("search-bar").addEventListener("keypress", e => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        checkPassword();
-      }
+    document.getElementById("pass").addEventListener("keypress", e => {
+      if (e.key === "Enter") unlock();
     });
+
+    // Auto-focus password field
+    document.getElementById("pass").focus();
   </script>
 </body>
 </html>
