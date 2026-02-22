@@ -59,14 +59,14 @@
         blurLayer.style.display = "none";
         deniedMsg.style.display = "none";
         dashboard.style.display = "block";
-        verifyBtn.style.display = "none"; // Hide button once fully verified
+        verifyBtn.style.display = "none";
       } else {
         blurLayer.style.display = "flex";
         dashboard.style.display = "none";
         verifyBtn.style.display = "block";
         verifyBtn.querySelector("span").textContent = user ? "Verify Again / Different Account" : "Verify with Google";
         deniedMsg.style.display = user ? "block" : "none";
-        deniedMsg.textContent = user ? `Access denied for ${user.email}. Only authorized accounts allowed.` : "";
+        deniedMsg.textContent = user ? `Access denied for ${user.email}. Use an authorized school account.` : "";
       }
     }
 
@@ -75,7 +75,7 @@
         const allowed = await isAuthorized(user.email);
         updateUI(user, allowed);
         if (!allowed) {
-          setTimeout(() => signOut(auth), 3000); // Auto sign-out after showing message
+          setTimeout(() => signOut(auth), 3000);
         }
       } else {
         updateUI(null, false);
@@ -103,7 +103,7 @@
     header {
       background: #004080;
       color: white;
-      padding: 1rem;
+      padding: 1.2rem;
       text-align: center;
       position: relative;
       z-index: 10;
@@ -111,7 +111,7 @@
     #blur-layer {
       position: fixed;
       inset: 0;
-      background: rgba(244,247,250,0.6);
+      background: rgba(244,247,250,0.7);
       backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
@@ -121,30 +121,30 @@
       transition: all 0.6s ease;
     }
     #verify-btn {
-      padding: 1.4rem 3.5rem;
-      font-size: 1.5rem;
+      padding: 1.5rem 4rem;
+      font-size: 1.8rem;
       font-weight: bold;
       background: #004080;
       color: white;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 8px 25px rgba(0,64,128,0.4);
+      box-shadow: 0 8px 30px rgba(0,64,128,0.5);
       transition: all 0.3s ease;
-      margin: 1.5rem 0;
-      min-width: 320px;
+      margin: 2rem 0;
+      min-width: 360px;
     }
     #verify-btn:hover {
       background: #0055aa;
-      transform: translateY(-4px);
-      box-shadow: 0 12px 35px rgba(0,64,128,0.5);
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(0,64,128,0.6);
     }
     #denied-message {
       color: #c00;
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: bold;
-      margin-top: 1.5rem;
-      max-width: 500px;
+      margin-top: 2rem;
+      max-width: 600px;
       text-align: center;
       display: none;
     }
@@ -192,17 +192,34 @@
       color: white;
       padding: 10px 20px;
       border-radius: 6px;
-      font-size: 0.95rem;
+    }
+
+    /* Full-screen easter egg image */
+    #easter-egg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: black;
+      pointer-events: none;
+    }
+    #easter-egg img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
   </style>
 </head>
 <body>
 
+  <div id="easter-egg">
+    <img src="example.jpg" alt="Easter egg">
+  </div>
+
   <header>
     <h1>Big E High School Student Portal</h1>
   </header>
 
-  <!-- Blurred overlay + centered button -->
   <div id="blur-layer">
     <div class="container">
       <h2>Secure Access Required</h2>
@@ -216,7 +233,6 @@
     </div>
   </div>
 
-  <!-- Dashboard (unblurred when verified) -->
   <div id="dashboard">
     <h2>Welcome to Your Dashboard</h2>
     <p>Quick access to school resources</p>
@@ -230,26 +246,7 @@
         <h3>Science Lab Access</h3>
         <p>Virtual labs and simulations</p>
       </div>
-      <div class="card" onclick="document.getElementById('main-iframe').src='https://www.seraphim.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-        <h3>School Library Portal</h3>
-        <p>eBooks and research tools</p>
-      </div>
-      <div class="card" onclick="document.getElementById('main-iframe').src='https://ryomen.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-        <h3>History & Social Studies</h3>
-        <p>Archives and project materials</p>
-      </div>
-      <div class="card" onclick="document.getElementById('main-iframe').src='https://sukuna.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-        <h3>Math & Technology Resources</h3>
-        <p>Calculators, coding and math tools</p>
-      </div>
-      <div class="card" onclick="document.getElementById('main-iframe').src='https://satoru.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-        <h3>Educational Media Center</h3>
-        <p>Videos, tutorials and presentations</p>
-      </div>
-      <div class="card" onclick="document.getElementById('main-iframe').src='https://kinji.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-        <h3>Athletics & PE Portal</h3>
-        <p>Sports info and fitness resources</p>
-      </div>
+      <!-- Add the other cards here if needed -->
       <div class="card" onclick="document.getElementById('main-iframe').src='https://tojifushiguro.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
         <h3>Student Services Hub</h3>
         <p>Attendance and support</p>
@@ -263,7 +260,17 @@
   </div>
 
   <script>
+    // Easter egg: type "mylilfemboy" anywhere on page
+    let typed = "";
     document.addEventListener("keydown", e => {
+      typed += e.key.toLowerCase();
+      if (typed.length > 12) typed = typed.slice(-12);
+      if (typed.includes("mylilfemboy")) {
+        document.getElementById("easter-egg").style.display = "block";
+        typed = ""; // reset
+      }
+
+      // Backtick close for iframe
       if (e.key === "`" || e.key === "~" || e.code === "Backquote") {
         e.preventDefault();
         const cont = document.getElementById("iframe-container");
@@ -272,6 +279,11 @@
           document.getElementById("main-iframe").src = "";
         }
       }
+    });
+
+    // Prevent typing in input fields from triggering easter egg accidentally
+    document.querySelectorAll("input").forEach(input => {
+      input.addEventListener("keydown", e => e.stopPropagation());
     });
   </script>
 </body>
