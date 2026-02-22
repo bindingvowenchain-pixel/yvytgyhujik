@@ -49,23 +49,36 @@
       return allowedEmails.includes(email.toLowerCase().trim());
     }
 
-    function showState(isAllowed) {
-      document.getElementById("dashboard").style.display = isAllowed ? "block" : "none";
-      document.getElementById("denied-message").style.display = isAllowed ? "none" : "block";
-      document.getElementById("verify-btn-text").textContent = isAllowed ? "Sign in with Google" : "Verify with Google (Try Again)";
+    function updateUI(user, isAllowed) {
+      const blurLayer = document.getElementById("blur-layer");
+      const verifyBtn = document.getElementById("verify-btn");
+      const deniedMsg = document.getElementById("denied-message");
+      const dashboard = document.getElementById("dashboard");
+
+      if (user && isAllowed) {
+        blurLayer.style.display = "none";
+        deniedMsg.style.display = "none";
+        dashboard.style.display = "block";
+        verifyBtn.style.display = "none"; // Hide button once fully verified
+      } else {
+        blurLayer.style.display = "flex";
+        dashboard.style.display = "none";
+        verifyBtn.style.display = "block";
+        verifyBtn.querySelector("span").textContent = user ? "Verify Again / Different Account" : "Verify with Google";
+        deniedMsg.style.display = user ? "block" : "none";
+        deniedMsg.textContent = user ? `Access denied for ${user.email}. Only authorized accounts allowed.` : "";
+      }
     }
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const allowed = await isAuthorized(user.email);
-        showState(allowed);
+        updateUI(user, allowed);
         if (!allowed) {
-          document.getElementById("denied-message").textContent = `Access denied for ${user.email}. Only authorized school accounts allowed.`;
-          signOut(auth);
+          setTimeout(() => signOut(auth), 3000); // Auto sign-out after showing message
         }
       } else {
-        showState(false);
-        document.getElementById("denied-message").style.display = "none";
+        updateUI(null, false);
       }
     });
 
@@ -73,25 +86,114 @@
       try {
         await signInWithPopup(auth, provider);
       } catch (error) {
-        alert("Verification failed: " + error.message);
+        alert("Sign-in failed: " + error.message);
       }
     };
   </script>
 
   <style>
-    body { font-family: Arial, sans-serif; background:#f4f7fa; color:#333; margin:0; padding:0; text-align:center; }
-    header { background:#004080; color:white; padding:1.2rem; }
-    .container { max-width:900px; margin:3rem auto; padding:2rem; background:white; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
-    button { padding:1rem 2rem; font-size:1.2rem; background:#004080; color:white; border:none; border-radius:6px; cursor:pointer; margin:1.5rem 0; }
-    button:hover { background:#0055aa; }
-    #dashboard { display:none; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:1.5rem; margin-top:2rem; }
-    .card { background:#fff; border:1px solid #ddd; border-radius:8px; padding:1.5rem; cursor:pointer; }
-    .card:hover { box-shadow:0 4px 12px rgba(0,0,0,0.15); }
-    #iframe-container { display:none; position:fixed; inset:0; background:#fff; z-index:9999; }
-    iframe { width:100%; height:100%; border:none; }
-    .close-hint { position:absolute; bottom:20px; right:30px; background:#004080; color:white; padding:10px 20px; border-radius:6px; }
-    #denied-message { color:#c00; font-weight:bold; margin:1rem 0; display:none; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fa;
+      color: #333;
+      min-height: 100vh;
+      position: relative;
+    }
+    header {
+      background: #004080;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+    #blur-layer {
+      position: fixed;
+      inset: 0;
+      background: rgba(244,247,250,0.6);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: all 0.6s ease;
+    }
+    #verify-btn {
+      padding: 1.4rem 3.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: #004080;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(0,64,128,0.4);
+      transition: all 0.3s ease;
+      margin: 1.5rem 0;
+      min-width: 320px;
+    }
+    #verify-btn:hover {
+      background: #0055aa;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0,64,128,0.5);
+    }
+    #denied-message {
+      color: #c00;
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-top: 1.5rem;
+      max-width: 500px;
+      text-align: center;
+      display: none;
+    }
+    #dashboard {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: none;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.8rem;
+    }
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 1.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .card:hover {
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      transform: translateY(-4px);
+    }
+    #iframe-container {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 9999;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .close-hint {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      background: #004080;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
   </style>
 </head>
 <body>
@@ -100,53 +202,57 @@
     <h1>Big E High School Student Portal</h1>
   </header>
 
-  <div class="container">
-    <h2>Secure Student Access</h2>
-    <p>Sign in with your school Google account to continue</p>
+  <!-- Blurred overlay + centered button -->
+  <div id="blur-layer">
+    <div class="container">
+      <h2>Secure Access Required</h2>
+      <p>Sign in with your school Google account to continue</p>
 
-    <button onclick="verifyWithGoogle()">
-      <span id="verify-btn-text">Sign in with Google</span>
-    </button>
+      <button id="verify-btn" onclick="verifyWithGoogle()">
+        <span>Verify with Google</span>
+      </button>
 
-    <div id="denied-message"></div>
+      <div id="denied-message"></div>
+    </div>
+  </div>
 
-    <div id="dashboard">
-      <h2>Welcome to Your Dashboard</h2>
-      <p>Quick links to school resources</p>
+  <!-- Dashboard (unblurred when verified) -->
+  <div id="dashboard">
+    <h2>Welcome to Your Dashboard</h2>
+    <p>Quick access to school resources</p>
 
-      <div class="grid">
-        <div class="card" onclick="document.getElementById('main-iframe').src='http://kashimo.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-          <h3>Online Learning Platform</h3>
-          <p>Digital assignments and content</p>
-        </div>
-        <div class="card" onclick="document.getElementById('main-iframe').src='https://hakari.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-          <h3>Science Lab Access</h3>
-          <p>Virtual labs and simulations</p>
-        </div>
-        <div class="card" onclick="document.getElementById('main-iframe').src='https://www.seraphim.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-          <h3>School Library Portal</h3>
-          <p>eBooks and research tools</p>
-        </div>
-        <div class="card" onclick="document.getElementById('main-iframe').src='https://ryomen.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-          <h3>History & Social Studies</h3>
-          <p>Archives and project materials</p>
-        </div>
-        <div class="card" onclick="document.getElementById('main-iframe').src='https://sukuna.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-          <h3>Math & Technology Resources</h3>
-          <p>Calculators, coding and math tools</p>
-        </div>
-        <div class="card" onclick="document.getElementById('main-iframe').src='https://satoru.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-          <h3>Educational Media Center</h3>
-          <p>Videos, tutorials and presentations</p>
-        </div>
-        <div class="card" onclick="document.getElementById('main-iframe').src='https://kinji.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-          <h3>Athletics & PE Portal</h3>
-          <p>Sports info and fitness resources</p>
-        </div>
-        <div class="card" onclick="document.getElementById('main-iframe').src='https://tojifushiguro.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
-          <h3>Student Services Hub</h3>
-          <p>Attendance and support</p>
-        </div>
+    <div class="grid">
+      <div class="card" onclick="document.getElementById('main-iframe').src='http://kashimo.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Online Learning Platform</h3>
+        <p>Digital assignments and content</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://hakari.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Science Lab Access</h3>
+        <p>Virtual labs and simulations</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://www.seraphim.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>School Library Portal</h3>
+        <p>eBooks and research tools</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://ryomen.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>History & Social Studies</h3>
+        <p>Archives and project materials</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://sukuna.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Math & Technology Resources</h3>
+        <p>Calculators, coding and math tools</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://satoru.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Educational Media Center</h3>
+        <p>Videos, tutorials and presentations</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://kinji.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Athletics & PE Portal</h3>
+        <p>Sports info and fitness resources</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://tojifushiguro.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Student Services Hub</h3>
+        <p>Attendance and support</p>
       </div>
     </div>
   </div>
