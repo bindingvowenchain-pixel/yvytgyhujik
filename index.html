@@ -4,146 +4,182 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Big E High School - Student Portal</title>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+    // === YOUR FIREBASE CONFIG ===
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxLFPUqH_iSDjjiRjNvYj2g1f2jwTkF7w",
+      authDomain: "holycookedverification.firebaseapp.com",
+      projectId: "holycookedverification",
+      storageBucket: "holycookedverification.firebasestorage.app",
+      messagingSenderId: "963430469896",
+      appId: "1:963430469896:web:4b04fdd239dbdb16021cbd",
+      measurementId: "G-YJEQ8VRZLW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // === YOUR PUBLIC CSV LINK ===
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTDeOq47ZDCwqHqzMyO17hoCqmVQMQwfjJ13gHrDpf0NWYrLyzO8p5mAu2dfS-CH-NlfOXWXCHtUeZs/pub?output=csv";
+
+    let allowedEmails = [];
+
+    async function loadAllowedEmails() {
+      try {
+        const res = await fetch(csvUrl);
+        if (!res.ok) throw new Error("CSV fetch failed");
+        const text = await res.text();
+        allowedEmails = text.split("\n")
+          .map(line => line.split(",")[0]?.trim().toLowerCase())
+          .filter(Boolean);
+      } catch (err) {
+        console.error("Failed to load emails:", err);
+      }
+    }
+    loadAllowedEmails();
+
+    async function isAuthorized(email) {
+      await loadAllowedEmails();
+      return allowedEmails.includes(email.toLowerCase().trim());
+    }
+
+    function updateUI(user, isAllowed) {
+      const blurLayer = document.getElementById("blur-layer");
+      const verifyBtn = document.getElementById("verify-btn");
+      const deniedMsg = document.getElementById("denied-message");
+      const dashboard = document.getElementById("dashboard");
+
+      if (user && isAllowed) {
+        blurLayer.style.display = "none";
+        deniedMsg.style.display = "none";
+        dashboard.style.display = "block";
+        verifyBtn.style.display = "none"; // Hide button once fully verified
+      } else {
+        blurLayer.style.display = "flex";
+        dashboard.style.display = "none";
+        verifyBtn.style.display = "block";
+        verifyBtn.querySelector("span").textContent = user ? "Verify Again / Different Account" : "Verify with Google";
+        deniedMsg.style.display = user ? "block" : "none";
+        deniedMsg.textContent = user ? `Access denied for ${user.email}. Only authorized accounts allowed.` : "";
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const allowed = await isAuthorized(user.email);
+        updateUI(user, allowed);
+        if (!allowed) {
+          setTimeout(() => signOut(auth), 3000); // Auto sign-out after showing message
+        }
+      } else {
+        updateUI(null, false);
+      }
+    });
+
+    window.verifyWithGoogle = async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        alert("Sign-in failed: " + error.message);
+      }
+    };
+  </script>
+
   <style>
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Arial, sans-serif;
       background: #f4f7fa;
       color: #333;
-      line-height: 1.6;
+      min-height: 100vh;
+      position: relative;
     }
     header {
       background: #004080;
       color: white;
-      padding: 1rem 2rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .school-name {
-      font-size: 1.8rem;
-      font-weight: bold;
-    }
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-      margin: 0;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    nav a:hover { text-decoration: underline; }
-
-    main {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
-    }
-
-    #login-section {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 2.5rem;
-      max-width: 500px;
-      margin: 6rem auto 4rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 1rem;
       text-align: center;
+      position: relative;
+      z-index: 10;
     }
-    #login-section h1 {
-      color: #004080;
-      margin-bottom: 1rem;
-      font-size: 2rem;
+    #blur-layer {
+      position: fixed;
+      inset: 0;
+      background: rgba(244,247,250,0.6);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: all 0.6s ease;
     }
-    #login-section p {
-      color: #555;
-      margin-bottom: 1.8rem;
-    }
-    input[type="password"] {
-      width: 100%;
-      padding: 0.9rem;
-      font-size: 1.1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 1.2rem;
-    }
-    #login-section button {
-      width: 100%;
-      padding: 0.9rem;
-      font-size: 1.1rem;
+    #verify-btn {
+      padding: 1.4rem 3.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
       background: #004080;
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 12px;
       cursor: pointer;
+      box-shadow: 0 8px 25px rgba(0,64,128,0.4);
+      transition: all 0.3s ease;
+      margin: 1.5rem 0;
+      min-width: 320px;
     }
-    #login-section button:hover {
+    #verify-btn:hover {
       background: #0055aa;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0,64,128,0.5);
     }
-    #error {
+    #denied-message {
       color: #c00;
-      margin-top: 1rem;
+      font-size: 1.3rem;
       font-weight: bold;
-    }
-
-    #dashboard {
+      margin-top: 1.5rem;
+      max-width: 500px;
+      text-align: center;
       display: none;
     }
-    .welcome-box {
-      background: #e8f0ff;
-      border-left: 5px solid #004080;
-      padding: 1.5rem;
-      margin-bottom: 2.5rem;
-      border-radius: 6px;
-    }
-    .welcome-box h2 {
-      color: #004080;
-      margin-bottom: 0.5rem;
+    #dashboard {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: none;
     }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
+      gap: 1.8rem;
     }
     .card {
       background: white;
       border: 1px solid #ddd;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 1.8rem;
       text-align: center;
       cursor: pointer;
-      transition: box-shadow 0.2s;
+      transition: all 0.25s;
     }
     .card:hover {
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      transform: translateY(-4px);
     }
-    .card h3 {
-      color: #004080;
-      margin-bottom: 0.8rem;
-      font-size: 1.3rem;
-    }
-    .card p {
-      color: #666;
-      font-size: 0.95rem;
-    }
-
     #iframe-container {
       display: none;
       position: fixed;
       inset: 0;
       background: white;
-      z-index: 1000;
+      z-index: 9999;
     }
-    #main-iframe {
+    iframe {
       width: 100%;
       height: 100%;
       border: none;
@@ -154,143 +190,87 @@
       right: 30px;
       background: #004080;
       color: white;
-      padding: 8px 16px;
+      padding: 10px 20px;
       border-radius: 6px;
-      font-size: 0.9rem;
-      z-index: 1001;
-    }
-
-    footer {
-      background: #004080;
-      color: white;
-      text-align: center;
-      padding: 1.5rem;
-      margin-top: 4rem;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="header-inner">
-      <div class="school-name">Big E High School</div>
-      <nav>
-        <ul>
-          <li><a href="#">Home</a></li>
-          <li><a href="#">Students</a></li>
-          <li><a href="#">Parents</a></li>
-          <li><a href="#">Calendar</a></li>
-          <li><a href="#">Resources</a></li>
-        </ul>
-      </nav>
-    </div>
+    <h1>Big E High School Student Portal</h1>
   </header>
 
-  <main>
+  <!-- Blurred overlay + centered button -->
+  <div id="blur-layer">
+    <div class="container">
+      <h2>Secure Access Required</h2>
+      <p>Sign in with your school Google account to continue</p>
 
-    <section id="login-section">
-      <h1>Student Portal</h1>
-      <p>Log in to view grades, schedules, assignments and school services</p>
-      <input type="password" id="pass-input" placeholder="Enter access code">
-      <button onclick="checkCode()">Log In</button>
-      <div id="error"></div>
-    </section>
+      <button id="verify-btn" onclick="verifyWithGoogle()">
+        <span>Verify with Google</span>
+      </button>
 
-    <section id="dashboard">
-      <div class="welcome-box">
-        <h2>Welcome to Your Student Dashboard</h2>
-        <p>Access your classes, library, calendar and other school tools.</p>
+      <div id="denied-message"></div>
+    </div>
+  </div>
+
+  <!-- Dashboard (unblurred when verified) -->
+  <div id="dashboard">
+    <h2>Welcome to Your Dashboard</h2>
+    <p>Quick access to school resources</p>
+
+    <div class="grid">
+      <div class="card" onclick="document.getElementById('main-iframe').src='http://kashimo.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Online Learning Platform</h3>
+        <p>Digital assignments and content</p>
       </div>
-
-      <div class="grid">
-        <div class="card" onclick="openLink('http://kashimo.freeddns.org/')">
-          <h3>Online Learning Platform</h3>
-          <p>Digital assignments and class content</p>
-        </div>
-        <div class="card" onclick="openLink('https://hakari.freeddns.org/')">
-          <h3>Science Lab Access</h3>
-          <p>Virtual experiments and simulations</p>
-        </div>
-        <div class="card" onclick="openLink('https://www.seraphim.freeddns.org/')">
-          <h3>School Library Portal</h3>
-          <p>eBooks, databases and research tools</p>
-        </div>
-        <div class="card" onclick="openLink('https://ryomen.freeddns.org/')">
-          <h3>History & Social Studies</h3>
-          <p>Archives and project materials</p>
-        </div>
-        <div class="card" onclick="openLink('https://sukuna.freeddns.org/')">
-          <h3>Math & Technology Resources</h3>
-          <p>Calculators, coding and math tools</p>
-        </div>
-        <div class="card" onclick="openLink('https://satoru.freeddns.org/')">
-          <h3>Educational Media Center</h3>
-          <p>Videos, tutorials and presentations</p>
-        </div>
-        <div class="card" onclick="openLink('https://kinji.freeddns.org/')">
-          <h3>Athletics & PE Portal</h3>
-          <p>Sports info and fitness resources</p>
-        </div>
-        <div class="card" onclick="openLink('https://tojifushiguro.freeddns.org/')">
-          <h3>Student Services Hub</h3>
-          <p>Attendance, counseling and support</p>
-        </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://hakari.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Science Lab Access</h3>
+        <p>Virtual labs and simulations</p>
       </div>
-    </section>
-
-  </main>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://www.seraphim.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>School Library Portal</h3>
+        <p>eBooks and research tools</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://ryomen.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>History & Social Studies</h3>
+        <p>Archives and project materials</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://sukuna.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Math & Technology Resources</h3>
+        <p>Calculators, coding and math tools</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://satoru.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Educational Media Center</h3>
+        <p>Videos, tutorials and presentations</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://kinji.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Athletics & PE Portal</h3>
+        <p>Sports info and fitness resources</p>
+      </div>
+      <div class="card" onclick="document.getElementById('main-iframe').src='https://tojifushiguro.freeddns.org/'; document.getElementById('iframe-container').style.display='block';">
+        <h3>Student Services Hub</h3>
+        <p>Attendance and support</p>
+      </div>
+    </div>
+  </div>
 
   <div id="iframe-container">
     <iframe id="main-iframe" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" allowfullscreen></iframe>
     <div class="close-hint">Press ` (backtick) to close</div>
   </div>
 
-  <footer>
-    Big E High School • Indianapolis, IN • © 2026 Big E Public Schools
-  </footer>
-
   <script>
-    const validCodes = ["damnmonkeys", "Password1!"];
-
-    function checkCode() {
-      const input = document.getElementById("pass-input").value;
-      const errorDiv = document.getElementById("error");
-
-      if (validCodes.includes(input)) {
-        document.getElementById("login-section").style.display = "none";
-        document.getElementById("dashboard").style.display = "block";
-        errorDiv.textContent = "";
-      } else {
-        errorDiv.textContent = "Invalid access code. Try again.";
-        document.getElementById("pass-input").value = "";
-      }
-    }
-
-    function openLink(url) {
-      const iframe = document.getElementById("main-iframe");
-      iframe.src = url;
-      document.getElementById("iframe-container").style.display = "block";
-    }
-
-    // Improved backtick detection
-    document.addEventListener("keydown", function(e) {
-      // Detect ` or ~ (shift + `)
-      if (e.key === "`" || e.key === "~" || (e.keyCode === 192 && !e.shiftKey) || (e.keyCode === 192 && e.shiftKey)) {
-        e.preventDefault(); // Stop any default browser action
-        const container = document.getElementById("iframe-container");
-        if (container.style.display === "block") {
-          container.style.display = "none";
+    document.addEventListener("keydown", e => {
+      if (e.key === "`" || e.key === "~" || e.code === "Backquote") {
+        e.preventDefault();
+        const cont = document.getElementById("iframe-container");
+        if (cont.style.display === "block") {
+          cont.style.display = "none";
           document.getElementById("main-iframe").src = "";
         }
-      }
-    });
-
-    // Enter key in password field
-    document.getElementById("pass-input").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        checkCode();
       }
     });
   </script>
